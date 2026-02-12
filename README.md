@@ -38,13 +38,6 @@ You get a **live hosted website link**, and every time you update code in GitHub
 
 ---
 
-📌 **Frontend code reference:**  
-Use the files already included in this repository:
-- `index.html`
-- `style.css`
-
----
-
 ## ✅ CI/CD Website Project Steps (Short)
 
 ### 1) Create a GitHub Repository
@@ -52,7 +45,10 @@ Use the files already included in this repository:
 - Upload your website files:
   - `index.html`
   - `style.css`
-  - `script.js`
+- 📌 **Frontend code reference:**  
+    Use the files already included in this repository:
+      - `index.html`
+      - `style.css`
 
 ---
 
