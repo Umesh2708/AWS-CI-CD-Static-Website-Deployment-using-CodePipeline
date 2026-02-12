@@ -42,7 +42,6 @@ You get a **live hosted website link**, and every time you update code in GitHub
 Use the files already included in this repository:
 - `index.html`
 - `style.css`
-- `script.js`
 
 ---
 
