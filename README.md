@@ -41,86 +41,152 @@ You get a **live hosted website link**, and every time you update code in GitHub
 ## ✅ CI/CD Website Project Steps (Short)
 
 ### 1) Create a GitHub Repository
-- Create a new repo (public or private)
+- Create a new GitHub repo (**public or private**)
 - Upload your website files:
   - `index.html`
   - `style.css`
-- 📌 **Frontend code reference:**  
-    Use the files already included in this repository:
-      - `index.html`
-      - `style.css`
+
+📌 **Frontend code reference:**  
+Use the files already included in this repository:
+- `index.html`
+- `style.css`
 
 ---
 
-### 2) Create an S3 Bucket
-- Create a bucket (example: `my-cicd-website-bucket`)
-- Keep the bucket in the same region where you will create the pipeline
+### 2) Create an S3 Bucket (for Website Hosting)
+- Go to **Amazon S3 → Create bucket**
+- Example bucket name: `my-cicd-website-bucket`
+- Keep the bucket in the **same region** where you will create the pipeline (example: `us-east-1`)
+
+⚠️ **Important:**  
+Do **NOT** upload website files manually in this bucket.  
+The pipeline will deploy the files automatically.
 
 ---
 
 ### 3) Enable Static Website Hosting
 Go to:
-- **S3 → Your Bucket → Properties → Static website hosting**
-- Enable it
-- Set:
-  - **Index document:** `index.html`
-  - (Optional) **Error document:** `index.html`
+
+**S3 → Your Bucket → Properties → Static website hosting**
+
+Enable it and set:
+
+- **Index document:** `index.html`
+- (Optional) **Error document:** `index.html`
+
+⚠️ Important rule (to avoid the error we faced):  
+✅ `index.html` must be at the **ROOT** of the bucket  
+❌ Do not keep it inside a folder like: `project/index.html`
 
 ---
 
 ### 4) Make the Bucket Public (Only for Website Hosting)
 You must allow public access so users can open the website.
 
+#### A) Disable Block Public Access
 Go to:
-- **Permissions → Block public access**
-  - Uncheck **Block all public access**
-- Add a **Bucket Policy** that allows public read access for website files.
+
+**S3 → Bucket → Permissions → Block public access**
+
+- Uncheck **Block all public access**
+- Save changes
+
+#### B) Add Bucket Policy (Public Read)
+Go to:
+
+**S3 → Bucket → Permissions → Bucket policy**
+
+📌 Add a public-read policy  
+(**For policy JSON, refer to the bucket policy given above in this repository / notes**)
 
 ---
 
 ### 5) Create a CodePipeline
 Go to:
-- **AWS CodePipeline → Create pipeline**
 
-Set stages like this:
+**AWS CodePipeline → Create pipeline**
 
-#### ✅ Source Stage
-- Source provider: **GitHub**
-- Select your repo + branch (example: `main`)
+#### A) Pipeline Settings
+- Pipeline name: `github-auto-deploy` (or any name you want)
+- Service role: **New service role** (recommended)
 
-#### ✅ Build Stage (Optional but Recommended)
-- Build provider: **AWS CodeBuild**
-- Create a new build project
-- Output: build artifacts
+---
 
-#### ✅ Deploy Stage
+#### B) Source Stage (IMPORTANT)
+- Source provider: **GitHub (via GitHub App)**
+- Click: **Connect to GitHub**
+- Connection name: you can type any name  
+  Example: `github-connection-cicd`
+
+✅ Important:
+- Install/Authorize the GitHub App (required)
+- Select your repository + branch (example: `main`)
+
+⚠️ If repo list is not showing:
+- Your GitHub App is not installed/authorized properly
+
+---
+
+#### C) Build Stage (Optional)
+You can:
+- **Skip build stage** (for simple HTML/CSS websites)
+
+OR
+
+Use:
+- Build provider: **AWS CodeBuild** (recommended for advanced workflows)
+
+---
+
+#### D) Deploy Stage (IMPORTANT)
 - Deploy provider: **Amazon S3**
-- Bucket: your static website bucket
-- Enable: **Extract file before deploy**
+- Bucket: select your **website hosting bucket**
+- Enable: ✅ **Extract file before deploy**
+
+This is mandatory so your files deploy correctly.
 
 ---
 
-### 6) Test the Deployment
-- Open the S3 static website URL
-- You should see your website live
+### 6) Confirm Pipeline Success
+After creating, you will see a pipeline diagram:
+
+- ✅ Source should turn **green**
+- ✅ Deploy should turn **green**
+
+If Deploy is red:
+- Usually bucket permission / artifact extraction issue
 
 ---
 
-### 7) Auto Deployment Test
+### 7) Test Website
+Go to:
+
+**S3 → Bucket → Properties → Static website hosting**
+
+Copy the **Website endpoint URL**  
+Open it in browser → your website should load.
+
+---
+
+### 8) Auto-Deploy Test (Final Confirmation)
 - Make a change in `index.html`
 - Push it to GitHub
-- CodePipeline runs automatically
-- Website updates automatically 🎉
+- CodePipeline will run automatically
+- Refresh your website → changes will appear
 
 ---
 
-## ⚠️ Important Notes
+## ⚠️ Important Notes (Avoid Common Errors)
 
-- Make sure **S3 Static Website Hosting** is enabled.
-- Make sure the bucket is **public readable** for website access.
-- In CodePipeline deploy stage, always enable:
-  ✅ **Extract file before deploy**
-- CodeBuild is optional, but recommended if you want a professional CI/CD flow.
+✅ Keep `index.html` at bucket root  
+❌ Do not keep it like: `project/index.html`
+
+✅ Do not upload website files manually in the S3 bucket  
+Pipeline should deploy everything automatically
+
+✅ Always enable:
+- Bucket public read policy
+- Extract file before deploy
 
 ---
 
